@@ -1,0 +1,20 @@
+pass: qpqBOzH0Xp5Lcd1u
+username: balsal667788_db_user
+
+"email": "admin@stves.com",
+  "password": "123456"
+
+Owner login:
+email: owner@stves.com
+password: 123456
+
+1. Police login
+   email: police@stves.com
+   password: 123456
+
+2. Police → Verify Vehicle/Driver
+   Vehicle: SYL-METRO-GA-11-1234
+   License: DL-SYL-2026-001
+
+3. Police → My Cases
+   EC-2026-000002 show hocche kina check koro
