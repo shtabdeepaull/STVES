@@ -1,45 +1,75 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+const mongoose = require("mongoose");
 
-const userSchema = new mongoose.Schema(
+const UserSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true, trim: true },
-    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-    password: { type: String, required: true, minlength: 6, select: false },
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
+
+    password: {
+      type: String,
+      required: true,
+      select: false,
+    },
 
     role: {
       type: String,
-      enum: ['admin', 'police', 'driver', 'owner'],
-      required: true,
+      enum: ["admin", "police", "driver", "owner"],
+      default: "driver",
+      index: true,
     },
-
-    phone: { type: String, required: true },
-    nid: { type: String, required: true, unique: true },
-
-    badge: { type: String, unique: true, sparse: true },
-    station: String,
-    rank: String,
 
     status: {
       type: String,
-      enum: ['active', 'suspended', 'blacklisted'],
-      default: 'active',
+      enum: ["active", "inactive", "suspended", "blacklisted"],
+      default: "active",
+      index: true,
     },
 
-    profileImage: String,
+    phone: {
+      type: String,
+      trim: true,
+    },
+
+    nid: {
+      type: String,
+      trim: true,
+      sparse: true,
+    },
+
+    badge: {
+      type: String,
+      trim: true,
+      unique: true,
+      sparse: true,
+    },
+
+    station: {
+      type: String,
+      trim: true,
+    },
+
+    rank: {
+      type: String,
+      trim: true,
+    },
+
     lastLogin: Date,
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-userSchema.pre('save', async function () {
-  if (!this.isModified('password')) return;
-
-  this.password = await bcrypt.hash(this.password, 12);
-});
-
-userSchema.methods.comparePassword = function (candidatePassword) {
-  return bcrypt.compare(candidatePassword, this.password);
-};
-
-module.exports = mongoose.model('User', userSchema);
+module.exports =
+  mongoose.models.User || mongoose.model("User", UserSchema, "users");

@@ -5,7 +5,10 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "setup:brta": "node scripts/setupBrtaMockDatabase.js",
+    "dev:industrial": "nodemon server.industrial.js",
+    "start:industrial": "node server.industrial.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
