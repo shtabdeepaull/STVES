@@ -1,6 +1,10 @@
 
 const authRoutes = require("./routes/auth.routes");
 const vehicleRoutes = require("./routes/vehicle.routes");
+const licenseRoutes = require("./routes/license.routes");
+const qrRoutes = require("./routes/qr.routes");
+const violationRoutes = require("./routes/violation.routes");
+const assignmentRoutes = require("./routes/assignment.routes");
 
 const express = require("express");
 const cors = require("cors");
@@ -49,6 +53,10 @@ app.get("/api/health", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/vehicles", vehicleRoutes);
+app.use("/api/licenses", licenseRoutes);
+app.use("/api/qr", qrRoutes);
+app.use("/api/violations", violationRoutes);
+app.use("/api/assignments", assignmentRoutes);
 
 
 app.use(notFoundMiddleware);
