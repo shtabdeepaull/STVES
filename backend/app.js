@@ -8,6 +8,8 @@ const assignmentRoutes = require("./routes/assignment.routes");
 const analyticsRoutes = require("./routes/analytics.routes");
 const logRoutes = require("./routes/log.routes");
 const verificationLogRoutes = require("./routes/verificationLog.routes");
+const userRoutes = require("./routes/user.routes");
+const adminRoutes = require("./routes/admin.routes");
 
 const express = require("express");
 const cors = require("cors");
@@ -55,6 +57,7 @@ app.get("/api/health", (req, res) => {
 
 
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/vehicles", vehicleRoutes);
 app.use("/api/licenses", licenseRoutes);
 app.use("/api/qr", qrRoutes);
@@ -63,6 +66,7 @@ app.use("/api/assignments", assignmentRoutes);
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/logs", logRoutes);
 app.use("/api/verification-logs", verificationLogRoutes);
+app.use("/api/admin", adminRoutes);
 
 
 app.use(notFoundMiddleware);
