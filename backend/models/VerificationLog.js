@@ -1,53 +1,127 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const verificationLogSchema = new mongoose.Schema(
   {
     officer: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
+      ref: "User",
+      index: true,
+    },
+
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      index: true,
     },
 
     searchType: {
       type: String,
-      enum: ['plate', 'license', 'qr_vehicle', 'qr_license'],
-      required: true,
+      enum: ["vehicle", "license", "qr", "plate", "driver"],
+      index: true,
+    },
+
+    type: {
+      type: String,
+      index: true,
     },
 
     searchValue: {
       type: String,
-      required: true,
+      trim: true,
+      index: true,
+    },
+
+    query: {
+      type: String,
+      trim: true,
+      index: true,
+    },
+
+    registrationNumber: {
+      type: String,
+      uppercase: true,
+      trim: true,
+      index: true,
+    },
+
+    licenseNumber: {
+      type: String,
+      uppercase: true,
+      trim: true,
+      index: true,
     },
 
     vehicle: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Vehicle',
-    },
-
-    driver: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
+      ref: "Vehicle",
     },
 
     license: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'DrivingLicense',
+      ref: "DrivingLicense",
+    },
+
+    driver: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+
+    dataSource: {
+      type: String,
+      default: "BRTA_MOCK",
+    },
+
+    brtaProvider: {
+      type: String,
+      default: "Mock BRTA Registry",
     },
 
     result: {
       type: String,
-      enum: ['valid', 'invalid', 'warning', 'blacklisted'],
-      required: true,
+      enum: ["valid", "invalid", "warning", "not_found", "error"],
+      default: "valid",
+      index: true,
     },
 
-    issues: [String],
+    isCompliant: Boolean,
 
-    verifiedAt: {
-      type: Date,
-      default: Date.now,
+    safetyScore: Number,
+    complianceScore: Number,
+    riskLevel: String,
+
+    verification: {
+      result: String,
+      isCompliant: Boolean,
+      safetyScore: Number,
+      complianceScore: Number,
+      riskLevel: String,
+    },
+
+    issues: [
+      {
+        code: String,
+        message: String,
+        severity: String,
+        penalty: Number,
+      },
+    ],
+
+    location: {
+      address: String,
+      city: String,
+      district: String,
+      lat: Number,
+      lng: Number,
+    },
+
+    deviceInfo: {
+      ip: String,
+      userAgent: String,
     },
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model('VerificationLog', verificationLogSchema);
+module.exports =
+  mongoose.models.VerificationLog ||
+  mongoose.model("VerificationLog", verificationLogSchema, "verificationlogs");

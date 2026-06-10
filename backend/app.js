@@ -5,6 +5,9 @@ const licenseRoutes = require("./routes/license.routes");
 const qrRoutes = require("./routes/qr.routes");
 const violationRoutes = require("./routes/violation.routes");
 const assignmentRoutes = require("./routes/assignment.routes");
+const analyticsRoutes = require("./routes/analytics.routes");
+const logRoutes = require("./routes/log.routes");
+const verificationLogRoutes = require("./routes/verificationLog.routes");
 
 const express = require("express");
 const cors = require("cors");
@@ -57,6 +60,9 @@ app.use("/api/licenses", licenseRoutes);
 app.use("/api/qr", qrRoutes);
 app.use("/api/violations", violationRoutes);
 app.use("/api/assignments", assignmentRoutes);
+app.use("/api/analytics", analyticsRoutes);
+app.use("/api/logs", logRoutes);
+app.use("/api/verification-logs", verificationLogRoutes);
 
 
 app.use(notFoundMiddleware);

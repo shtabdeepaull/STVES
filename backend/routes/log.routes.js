@@ -2,22 +2,22 @@ const express = require("express");
 
 const protect = require("../middlewares/authMiddleware");
 const authorizeRoles = require("../middlewares/roleMiddleware");
-const analyticsController = require("../controllers/analytics.controller");
+const logController = require("../controllers/log.controller");
 
 const router = express.Router();
 
 router.get(
-  "/",
+  "/verification",
   protect,
-  authorizeRoles("admin"),
-  analyticsController.getAnalytics
+  authorizeRoles("admin", "police"),
+  logController.getVerificationLogs
 );
 
 router.get(
-  "/logs",
+  "/activity",
   protect,
-  authorizeRoles("admin"),
-  analyticsController.getAnalyticsLogs
+  authorizeRoles("admin", "police"),
+  logController.getActivityLogs
 );
 
 module.exports = router;
