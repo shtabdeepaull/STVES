@@ -382,24 +382,44 @@ const updateViolationStatus = async ({ id, status, note, admin }) => {
   return violation;
 };
 
-const getVehicleViolations = async (registrationNumber, user) => {
-  const plate = normalizePlate(registrationNumber);
+const getVehicleViolations = async (registrationNumberOrId, user) => {
+  let plate = "";
+  let appVehicle = null;
+
+  if (isObjectId(registrationNumberOrId)) {
+    appVehicle = await Vehicle.findById(registrationNumberOrId).lean();
+
+    if (appVehicle?.registrationNumber) {
+      plate = normalizePlate(appVehicle.registrationNumber);
+    }
+  } else {
+    plate = normalizePlate(registrationNumberOrId);
+
+    appVehicle = await Vehicle.findOne({
+      registrationNumber: plate,
+    }).lean();
+  }
 
   const roleQuery = await buildViolationQueryForRole(user);
 
-  const appVehicle = await Vehicle.findOne({
-    registrationNumber: plate,
-  }).lean();
+  const orQuery = [];
 
-  const query = {
+  if (plate) {
+    orQuery.push({ registrationNumber: plate });
+  }
+
+  if (appVehicle?._id) {
+    orQuery.push({ vehicle: appVehicle._id });
+  }
+
+  if (orQuery.length === 0) {
+    return [];
+  }
+
+  const violations = await Violation.find({
     ...roleQuery,
-    $or: [
-      { registrationNumber: plate },
-      ...(appVehicle?._id ? [{ vehicle: appVehicle._id }] : []),
-    ],
-  };
-
-  const violations = await Violation.find(query)
+    $or: orQuery,
+  })
     .populate("vehicle", "registrationNumber brand model color vehicleType")
     .populate("driver", "name email role phone")
     .populate("license", "licenseNumber holderName licenseClass status")
@@ -409,7 +429,6 @@ const getVehicleViolations = async (registrationNumber, user) => {
 
   return violations;
 };
-
 module.exports = {
   createViolation,
   getViolations,

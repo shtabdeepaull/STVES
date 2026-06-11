@@ -10,6 +10,7 @@ const logRoutes = require("./routes/log.routes");
 const verificationLogRoutes = require("./routes/verificationLog.routes");
 const userRoutes = require("./routes/user.routes");
 const adminRoutes = require("./routes/admin.routes");
+const driverRoutes = require("./routes/driver.routes");
 
 const express = require("express");
 const cors = require("cors");
@@ -67,6 +68,7 @@ app.use("/api/analytics", analyticsRoutes);
 app.use("/api/logs", logRoutes);
 app.use("/api/verification-logs", verificationLogRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/driver", driverRoutes);
 
 
 app.use(notFoundMiddleware);

@@ -7,6 +7,10 @@ const getDashboard = asyncHandler(async (req, res) => {
 
   return sendSuccess(res, 200, "Admin dashboard fetched successfully.", {
     dashboard,
+
+
+    ...dashboard,
+    summary: dashboard.summary,
   });
 });
 

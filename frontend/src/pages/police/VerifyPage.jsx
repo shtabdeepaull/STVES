@@ -123,6 +123,32 @@ const getVehiclePlate = (vehicle) =>
 const getDriverName = (driver) =>
   typeof driver === "object" ? driver?.name || "N/A" : "N/A";
 
+const getIssueText = (issue) => {
+  if (!issue) return "Issue detected.";
+
+  if (typeof issue === "string") return issue;
+
+  if (typeof issue === "object") {
+    return issue.message || issue.code || "Issue detected.";
+  }
+
+  return String(issue);
+};
+
+const normalizeIssues = (issues = []) => {
+  if (!Array.isArray(issues)) return [];
+
+  return issues.map((issue) => {
+    if (typeof issue === "string") return issue;
+
+    if (issue && typeof issue === "object") {
+      return issue.message || issue.code || "Issue detected.";
+    }
+
+    return String(issue || "Issue detected.");
+  });
+};
+
 const formatDate = (dateValue) => {
   if (!dateValue) return "N/A";
 
@@ -196,7 +222,12 @@ export default function VerifyPage({ onNavigate, setVerificationResult }) {
 
   const normalizeVehicleResult = (vehicleData, licenseData = null) => {
     const vehicle = vehicleData?.vehicle || null;
-    const issues = vehicleData?.verification?.issues || [];
+    const issues = normalizeIssues(
+      vehicleData?.verification?.issues ||
+      vehicleData?.issues ||
+      vehicleData?.vehicle?.issues ||
+      []
+    );
     const verificationResult = vehicleData?.verification?.result || "valid";
 
     return {
@@ -218,7 +249,12 @@ export default function VerifyPage({ onNavigate, setVerificationResult }) {
 
   const normalizeLicenseResult = (licenseData) => {
     const license = licenseData?.license || null;
-    const issues = licenseData?.verification?.issues || [];
+    const issues = normalizeIssues(
+      licenseData?.verification?.issues ||
+      licenseData?.issues ||
+      licenseData?.license?.issues ||
+      []
+    );
     const verificationResult = licenseData?.verification?.result || "valid";
 
     return {
@@ -280,8 +316,8 @@ export default function VerifyPage({ onNavigate, setVerificationResult }) {
 
       const url = driverId
         ? `/vehicles/verify/${encodedPlate}?driverId=${encodeURIComponent(
-            driverId
-          )}`
+          driverId
+        )}`
         : `/vehicles/verify/${encodedPlate}`;
 
       const vehicleData = await apiGet(url);
@@ -345,11 +381,10 @@ export default function VerifyPage({ onNavigate, setVerificationResult }) {
     return (
       <div className="animate-fade-in space-y-4">
         <div
-          className={`rounded-2xl border p-5 flex items-center gap-4 ${
-            result.isCompliant
-              ? "bg-green-50 border-green-200"
-              : "bg-red-50 border-red-200"
-          }`}
+          className={`rounded-2xl border p-5 flex items-center gap-4 ${result.isCompliant
+            ? "bg-green-50 border-green-200"
+            : "bg-red-50 border-red-200"
+            }`}
         >
           {result.isCompliant ? (
             <CheckCircle size={34} className="text-green-500 shrink-0" />
@@ -359,9 +394,8 @@ export default function VerifyPage({ onNavigate, setVerificationResult }) {
 
           <div className="flex-1">
             <h3
-              className={`text-lg font-bold ${
-                result.isCompliant ? "text-green-700" : "text-red-700"
-              }`}
+              className={`text-lg font-bold ${result.isCompliant ? "text-green-700" : "text-red-700"
+                }`}
             >
               {result.isCompliant
                 ? "Vehicle is Compliant"
@@ -484,19 +518,17 @@ export default function VerifyPage({ onNavigate, setVerificationResult }) {
 
         {driverAuthorization?.checked && (
           <div
-            className={`rounded-2xl border p-5 ${
-              driverAuthorization.authorized
-                ? "bg-green-50 border-green-200"
-                : "bg-red-50 border-red-200"
-            }`}
+            className={`rounded-2xl border p-5 ${driverAuthorization.authorized
+              ? "bg-green-50 border-green-200"
+              : "bg-red-50 border-red-200"
+              }`}
           >
             <div className="flex items-start gap-4">
               <div
-                className={`w-11 h-11 rounded-xl flex items-center justify-center ${
-                  driverAuthorization.authorized
-                    ? "bg-green-100"
-                    : "bg-red-100"
-                }`}
+                className={`w-11 h-11 rounded-xl flex items-center justify-center ${driverAuthorization.authorized
+                  ? "bg-green-100"
+                  : "bg-red-100"
+                  }`}
               >
                 {driverAuthorization.authorized ? (
                   <CheckCircle size={24} className="text-green-600" />
@@ -507,11 +539,10 @@ export default function VerifyPage({ onNavigate, setVerificationResult }) {
 
               <div className="flex-1">
                 <h3
-                  className={`text-lg font-bold ${
-                    driverAuthorization.authorized
-                      ? "text-green-700"
-                      : "text-red-700"
-                  }`}
+                  className={`text-lg font-bold ${driverAuthorization.authorized
+                    ? "text-green-700"
+                    : "text-red-700"
+                    }`}
                 >
                   {driverAuthorization.authorized
                     ? "Driver Authorized"
@@ -590,11 +621,11 @@ export default function VerifyPage({ onNavigate, setVerificationResult }) {
             <div className="space-y-2">
               {issues.map((issue, index) => (
                 <div
-                  key={`${issue}-${index}`}
+                  key={`${getIssueText(issue)}-${index}`}
                   className="flex items-center gap-2 rounded-xl bg-red-50 px-4 py-3"
                 >
                   <XCircle size={15} className="text-red-500 shrink-0" />
-                  <span className="text-sm text-red-700">{issue}</span>
+                  <span className="text-sm text-red-700">{getIssueText(issue)}</span>
                 </div>
               ))}
             </div>
@@ -626,11 +657,10 @@ export default function VerifyPage({ onNavigate, setVerificationResult }) {
     return (
       <div className="animate-fade-in space-y-4">
         <div
-          className={`rounded-2xl border p-5 flex items-center gap-4 ${
-            result.isCompliant
-              ? "bg-green-50 border-green-200"
-              : "bg-red-50 border-red-200"
-          }`}
+          className={`rounded-2xl border p-5 flex items-center gap-4 ${result.isCompliant
+            ? "bg-green-50 border-green-200"
+            : "bg-red-50 border-red-200"
+            }`}
         >
           {result.isCompliant ? (
             <CheckCircle size={34} className="text-green-500 shrink-0" />
@@ -640,9 +670,8 @@ export default function VerifyPage({ onNavigate, setVerificationResult }) {
 
           <div>
             <h3
-              className={`text-lg font-bold ${
-                result.isCompliant ? "text-green-700" : "text-red-700"
-              }`}
+              className={`text-lg font-bold ${result.isCompliant ? "text-green-700" : "text-red-700"
+                }`}
             >
               {result.isCompliant ? "License is Valid" : "License Has Issues"}
             </h3>
@@ -757,11 +786,11 @@ export default function VerifyPage({ onNavigate, setVerificationResult }) {
             <div className="space-y-2">
               {issues.map((issue, index) => (
                 <div
-                  key={`${issue}-${index}`}
+                  key={`${getIssueText(issue)}-${index}`}
                   className="flex items-center gap-2 rounded-xl bg-red-50 px-4 py-3"
                 >
                   <XCircle size={15} className="text-red-500 shrink-0" />
-                  <span className="text-sm text-red-700">{issue}</span>
+                  <span className="text-sm text-red-700">{getIssueText(issue)}</span>
                 </div>
               ))}
             </div>
@@ -788,11 +817,10 @@ export default function VerifyPage({ onNavigate, setVerificationResult }) {
           <button
             type="button"
             onClick={() => handleModeChange("vehicle")}
-            className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition ${
-              mode === "vehicle"
-                ? "bg-[#0b4f86] text-white shadow"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
+            className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition ${mode === "vehicle"
+              ? "bg-[#0b4f86] text-white shadow"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
           >
             <Car size={16} />
             Vehicle Search
@@ -801,11 +829,10 @@ export default function VerifyPage({ onNavigate, setVerificationResult }) {
           <button
             type="button"
             onClick={() => handleModeChange("driver")}
-            className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition ${
-              mode === "driver"
-                ? "bg-[#0b4f86] text-white shadow"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
+            className={`flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition ${mode === "driver"
+              ? "bg-[#0b4f86] text-white shadow"
+              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
           >
             <IdCard size={16} />
             Driver Search

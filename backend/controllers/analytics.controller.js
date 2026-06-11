@@ -8,6 +8,8 @@ const getAnalytics = asyncHandler(async (req, res) => {
 
   return sendSuccess(res, 200, "Analytics fetched successfully.", {
     analytics,
+
+     ...analytics,
   });
 });
 

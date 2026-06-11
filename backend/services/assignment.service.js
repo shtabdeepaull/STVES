@@ -411,8 +411,38 @@ const removeAssignment = async ({ id, reason, user }) => {
 };
 
 const checkAssignment = async ({ registrationNumber, licenseNumber }) => {
-  const plate = normalizePlate(registrationNumber);
-  const cleanLicense = normalizeLicense(licenseNumber);
+  let plate = "";
+  let cleanLicense = "";
+
+  // First param can be vehicle ObjectId or registration number
+  if (isObjectId(registrationNumber)) {
+    const appVehicle = await Vehicle.findById(registrationNumber).lean();
+
+    if (appVehicle?.registrationNumber) {
+      plate = normalizePlate(appVehicle.registrationNumber);
+    }
+  } else {
+    plate = normalizePlate(registrationNumber);
+  }
+
+  // Second param can be license ObjectId, driver ObjectId, or license number
+  if (isObjectId(licenseNumber)) {
+    const appLicenseById = await DrivingLicense.findById(licenseNumber).lean();
+
+    if (appLicenseById?.licenseNumber) {
+      cleanLicense = normalizeLicense(appLicenseById.licenseNumber);
+    } else {
+      const appLicenseByDriver = await DrivingLicense.findOne({
+        driver: licenseNumber,
+      }).lean();
+
+      if (appLicenseByDriver?.licenseNumber) {
+        cleanLicense = normalizeLicense(appLicenseByDriver.licenseNumber);
+      }
+    }
+  } else {
+    cleanLicense = normalizeLicense(licenseNumber);
+  }
 
   if (!plate || !cleanLicense) {
     throw new AppError("Registration number and license number are required.", 400);
@@ -424,7 +454,11 @@ const checkAssignment = async ({ registrationNumber, licenseNumber }) => {
     registrationNumber: plate,
     licenseNumber: cleanLicense,
     status: "active",
-    $or: [{ endDate: { $exists: false } }, { endDate: null }, { endDate: { $gte: now } }],
+    $or: [
+      { endDate: { $exists: false } },
+      { endDate: null },
+      { endDate: { $gte: now } },
+    ],
   }).lean();
 
   if (appAssignment) {

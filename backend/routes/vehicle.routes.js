@@ -13,6 +13,13 @@ router.get(
   vehicleController.getVehicles
 );
 
+router.post(
+  "/",
+  protect,
+  authorizeRoles("admin", "owner"),
+  vehicleController.createVehicle
+);
+
 router.get(
   "/my",
   protect,
@@ -25,6 +32,16 @@ router.get(
   protect,
   authorizeRoles("admin", "police", "owner"),
   vehicleController.verifyVehicle
+);
+
+
+
+
+router.patch(
+  "/:id",
+  protect,
+  authorizeRoles("admin", "owner"),
+  vehicleController.updateVehicle
 );
 
 module.exports = router;
